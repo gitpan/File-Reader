@@ -1,8 +1,13 @@
 Changes
 Makefile.PL
 MANIFEST
-PerlSource
-Reader.pm
 README
-TODO
-test.pl
+gen_conf.pl
+t/File-Reader.t
+lib/File/Reader.pm
+t/PerlSource.pl
+t/ex1.conf
+t/sertarien
+t/nofile.conf
+
+META.yml                                 Module meta-data (added by MakeMaker)

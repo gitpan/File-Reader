@@ -1,6 +1,0 @@
-TODO list for File::Reader
-
-I'm currently working on the 0.6 version of the module. There is 2 functionnalities that I want to implemant in File::Reader
-
-1 - WriteConf* functions wich permit to write your configuration files.
-2 - Support of (en|de)cryption with GnuPG for all the functions (I'm slowed down by some security problems like race condition).
