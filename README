@@ -1,0 +1,30 @@
+File/Reader version 0.5
+========================
+
+File::Reader allow you to simply manipulate your text files. You can easily read and write text file (or sources codes, HTML, XML, etc.).
+I personally use very often Write() to generate HTML code.
+File::Reader also provided a good interface for reading configuration files.
+
+This current release (0.5) work really fine. The module is not in version 1.0 because I hope to associate many news functions to him (read the TODO file for more information).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Term::ANSIColor
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Arnaud DUPUIS <arno@asocial.org>. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension File::Reader.
+
+0.01  Tue Jan 27 19:16:55 2004
+	- original version; created by h2xs 1.21 with options
+		-A -X -n File::Reader
+
