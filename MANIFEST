@@ -1,6 +1,8 @@
 Changes
 Makefile.PL
 MANIFEST
+PerlSource
 Reader.pm
 README
+TODO
 test.pl

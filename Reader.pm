@@ -9,8 +9,8 @@ BEGIN
 {
 	use Exporter();
 	our @ISA=qw(Exporter);
-	our @EXPORT_OK=qw(&Write &ecrire &ouvre &reecrire &lireConfAdv &lireConf &listRep  &listDir &sReecrire &sOuvre &sLireConf &sLireConfAdv &lireConfAdv2 &sLireConf2 &sLireConfAdv2 &lireConf2 &Read &ReWrite &ReadConfAdv &ReadConf &listRep &sReWrite &sWrite &sRead &sReadConf &sReadConfAdv &ReadConfAdv2 &sReadConf2 &sReadConfAdv2 &ReadConf2);
-	our $VERSION=0.5;
+	our @EXPORT_OK=qw(&Write &ecrire &ouvre &reecrire &lireConfAdv &lireConf &listRep  &listDir &sReecrire &sOuvre &sLireConf &sLireConfAdv &lireConfAdv2 &sLireConf2 &sLireConfAdv2 &lireConf2 &Read &ReWrite &ReadConfAdv &ReadConf &listRep &sReWrite &sWrite &sRead &sReadConf &sReadConfAdv &ReadConfAdv2 &sReadConf2 &sReadConfAdv2 &ReadConf2 &generateConfFile);
+	our $VERSION=0.6;
 }
 sub Write
 {
@@ -25,7 +25,7 @@ sub Write
 sub Read
 {
         my ($nom_fichier)=@_;
-	unless ( -e $nom_fichier && -R $nom_fichier)
+	unless ( -e $nom_fichier or -R $nom_fichier)
 	{
 		warn "[ File::Reader ] unable to read $nom_fichier : $!\n";
 		return undef ;
@@ -74,6 +74,8 @@ sub findStartTag
 	my $k=0;
 	while (defined(my $tmp=$$r_tab[$k]))
 	{
+		chomp $tmp;
+		#print "[ findStartTag ] : \$tmp = '$tmp' et \$start_tag = '$start_tag'\n";
 		if ($tmp eq $start_tag)
 		{
 			$k++;
@@ -87,6 +89,11 @@ sub ReadConfAdv2
 {
 	my ($conf_fln,$conf_start,$conf_stop,$sep)=@_;
 	#print "[ File::Reader dev Tracer ]\n\$conf_fln : $conf_fln\n\$conf_start : $conf_start\n\$conf_stop : $conf_stop\n";
+	unless ( -e $conf_fln or -R $conf_fln)
+	{
+		warn "[ File::Reader ] unable to read $conf_fln : $!\n";
+		return undef ;
+	}
 	my @cfg=Read("$conf_fln");
 	my $k=0;
 	my $fin='non';
@@ -105,9 +112,11 @@ sub ReadConfAdv2
 			{
 				$cfg[$k]=supprComment($cfg[$k]);
 				$cfg[$k]=~ s/\s?$sep\s?/$sep/;
+				chomp $cfg[$k] ;
 				if ($cfg[$k] eq $conf_stop)
 				{
 					$fin='oui';
+					return %conf;
 				}
 				if ($cfg[$k]=~ /$sep/i && $cfg[$k] ne $conf_start)
 				{
@@ -128,8 +137,13 @@ sub ReadConfAdv2
 
 sub ReadConfAdv
 {
-	my ($conf_fln,$conf_start,$conf_stop)=@_;
+	my ($conf_fln,$conf_start,$conf_stop) = @_ ;
 	#print "[ Battosai dev Tracer ]\n\$conf_fln : $conf_fln\n\$conf_start : $conf_start\n\$conf_stop : $conf_stop\n";
+	unless ( -e $conf_fln or -R $conf_fln)
+	{
+		warn "[ File::Reader ] unable to read $conf_fln : $!\n";
+		return undef ;
+	}
 	my @cfg=Read("$conf_fln");
 	my $k=0;
 	my $fin='non';
@@ -137,7 +151,8 @@ sub ReadConfAdv
 	$k=findStartTag(\@cfg,$conf_start);
 	unless (defined($k))
 	{
-		return 0;
+		#print "[ UNLESS ] \$k => $k\n";
+		return undef;
 	}
 	while ($fin eq 'non')
 	{
@@ -148,14 +163,16 @@ sub ReadConfAdv
 			{
 				$cfg[$k]=supprComment($cfg[$k]);
 				$cfg[$k]=~ s/\s?=\s?/=/;
+				chomp $cfg[$k] ;
 				if ($cfg[$k] eq $conf_stop)
 				{
 					$fin='oui';
+					return %conf;
 				}
 				if ($cfg[$k]=~ /=/i && $cfg[$k] ne $conf_start)
 				{
 						my ($key,$value)=split(/=/,$cfg[$k]);
-						#print "'$key' : '$value'\n";
+						#print "=> '$key' : '$value'\n";
 						$conf{$key}=$value;
 				}
 			}
@@ -171,7 +188,7 @@ sub ReadConfAdv
 sub ReadConf
 {
 	my ($conf_fln)=@_;
-	unless ( -e $conf_fln && -R $conf_fln)
+	unless ( -e $conf_fln or -R $conf_fln)
 	{
 		warn "[ File::Reader ] unable to read $conf_fln : $!\n";
 		return undef ;
@@ -198,7 +215,7 @@ sub ReadConf
 sub ReadConf2
 {
 	my ($conf_fln,$sep)=@_;
-	unless ( -e $conf_fln && -R $conf_fln)
+	unless ( -e $conf_fln or -R $conf_fln)
 	{
 		warn "[ File::Reader ] unable to read $conf_fln : $!\n";
 		return undef ;
@@ -695,9 +712,11 @@ sub sReadConfAdv
 			{
 				$cfg[$k]=supprComment($cfg[$k]);
 				$cfg[$k]=~ s/\s?=\s?/=/;
+				chomp $cfg[$k] ;
 				if ($cfg[$k] eq $conf_stop)
 				{
 					$fin='oui';
+					return %conf;
 				}
 				if ($cfg[$k]=~ /=/i && $cfg[$k] ne $conf_start)
 				{
@@ -746,16 +765,21 @@ sub sReadConfAdv2
 			unless ($cfg[$k]=~ /^$/i)
 			{
 				$cfg[$k]=supprComment($cfg[$k]);
-				$cfg[$k]=~ s/\s?$sep\s?/$sep/;
-				if ($cfg[$k] eq $conf_stop)
+				if (defined($cfg[$k]) && $cfg[$k] !~ /^$/i)
 				{
-					$fin='oui';
-				}
-				if ($cfg[$k]=~ /$sep/i && $cfg[$k] ne $conf_start)
-				{
-						my ($key,$value)=split(/$sep/,$cfg[$k]);
-						#print "'$key' : '$value'\n";
-						$conf{$key}=$value;
+					$cfg[$k]=~ s/\s?$sep\s?/$sep/;
+					chomp $cfg[$k] ;
+					if ($cfg[$k] eq $conf_stop)
+					{
+						$fin='oui';
+						return %conf;
+					}
+					if ($cfg[$k]=~ /$sep/i && $cfg[$k] ne $conf_start)
+					{
+							my ($key,$value)=split(/$sep/,$cfg[$k]);
+							#print "'$key' : '$value'\n";
+							$conf{$key}=$value;
+					}
 				}
 			}
 		}
@@ -766,6 +790,71 @@ sub sReadConfAdv2
 		}
 	}
 	return %conf;
+}
+
+sub generateConfFile
+{
+	my ($pgmName,$confName) = @_ ;
+	unless(defined($pgmName))
+	{
+		warn "[ File::Reader ] first parameter not defined (original Perl source name).\n" ;
+		return undef ;
+	}
+	unless (-e $pgmName)
+	{
+		warn "[ File::Reader ] $pgmName doeesn't exist !\n" ;
+		return undef ;
+	}
+	my $finalName = $pgmName ;
+	if ($pgmName =~ /\.pl/)
+	{
+		$finalName =~ s/\.pl/_withconf.pl/;
+	}
+	else
+	{
+		$finalName .= '_withconf';
+	}
+	my @tab = Read($pgmName) ;
+	my @final = () ;
+	Write($confName,"## Configuration file for $pgmName generated by File::Reader version $File::Reader::VERSION\n\n");
+	foreach my $a (@tab)
+	{
+		if ($a =~ /#!.*perl.*/)
+		{
+			#print "[ MATCH PERL ] $a\n";
+			$a .= "\n\nuse File::Reader qw( ReadConf );\n\nmy \%conf = ReadConf('$confName');\n\n";
+			push @final, $a;
+		}
+		elsif ($a =~ /^.*\$[A-Z_]*\s*={1}.*$/)
+		{
+			if($a !~ /^.*==.*$/ or $a !~ /^.*=~.*$/)
+			{
+				my $tmp = $a ;
+				$a=~ s/^my //;
+				$a=~ s/^our //;
+				$a=~ s/;$//;
+				$a=~ s/^\$//;
+				my ($t1,$t2) = split(/=/,$a) ;
+				#print "[ == ]$tmp\n";
+				ReWrite($confName,"$a\n");
+				$t1 =~ s/\s//g;
+				my ($t3,$t4) = split(/=/,$tmp);
+				$tmp = "$t3 = \$conf{$t1} ;\n" ;
+				push @final, $tmp;
+			}
+			else
+			{
+				#print "[ != ] $a\n";
+				push @final, $a;
+			}
+		}
+		else
+		{
+			#print "[ else ] $a\n" ;
+			push @final, $a;
+		}
+	}
+	Write($finalName,@final);
 }
 
 ## The following functions are for the compatibility with the old's Battosai syntax
@@ -851,7 +940,8 @@ return 1;
 END{}
 
 __END__
-# Below is stub documentation for your module. You better edit it!
+
+# And now ladies and gentlemen...The documentation !!!!
 
 =head1 NAME
 
@@ -865,7 +955,7 @@ File::Reader - Perl extension for Read and write easily text file
 
 @mysArray = sRead('/home/arnaud/.bashrc',1,2);
 
-$file = '/home/arnaud/write_by_Battosai' ;
+$file = '/home/arnaud/write_by_File_Reader ;
 
 $message = "Something to write\n" ;
 
@@ -884,7 +974,7 @@ sWrite($file,"Something to write\n",1,2) ;
 
 =head3 Write :
 
-Write(file_to_write, data_to_write) : this function write somme data in a file. You can call it like that : Write($file, @data) ;
+Write(file_to_write, data_to_write) : this function write some data in a file. You can call it like that : Write($file, @data) ;
 
 =head3 Read :
 
@@ -896,7 +986,7 @@ ReWrite(file_to_write, data_to_write) : write data in the end of "file_to_write"
 
 =head3 ReadConf :
 
-ReadConf("some_configuration_file") : Read a configuration (wich is write like : key = value) and return a hash (usable by : $conf{key}). ReadConf() return B<undef> if the file that you try to read does not exist.
+ReadConf("some_configuration_file") : Read a configuration file (wich is write like : key = value) and return a hash (usable by : $conf{key}). ReadConf() return B<undef> if the file that you try to read does not exist.
 
 =head3 ReadConf2 :
 
@@ -942,39 +1032,39 @@ key3 = value3
 
 ReadConfAdv2($conf_fln,$conf_start,$conf_stop,$level,$sep) : same options that ReadConfAdv() but you can specify, moreover, the separator of the pairs of keys/values in the configuration file (like ReadConf2() ).
 
-=head3 listRep :
+=head3 listDir :
 
-listRep("any_directory/" : return a table containing the contents of "any_directory/"
+listDir("any_directory/" : return a table containing the contents of "any_directory/"
 
-Ex : @dir = listRep("/etc/") ;
+Ex : @dir = listDir("/etc/") ;
 
 
 =over 8
 
 
-=item * The following function (s*) are the "secure" version of previous functions. They make somes tests one files before reading and writing them.
+=item * The following function (s*) are the "secure" version of previous functions. They make somes tests on files before reading and writing them.
 
 =back
 
 =head3 sReWrite :
 
-sReWrite($name,$data,$warning) : if you set $warning to 1 (default) File::Reader print test on STDERR. If $warning = 0, STDERR is redirect to file_reader_err.log.
+sReWrite($name,$data,$warning) : if you set $warning to 1 (default) File::Reader print test on STDERR. If $warning = 0, STDERR is redirected to file_reader_err.log.
 
 =head3 sWrite :
 
-sWrite($name,$data,$warning) : same as sReWrite() but with Write() functionnality.
+sWrite($name,$data,$warning) : same as sReWrite() but with Write() functionality.
 
 =head3 sRead :
 
-sRead($name,$warning,$level) : see sReWrite() for explanations relating to $warning. $level can take severals values :
+sRead($name,$warning,$level) : see sReWrite() for explanations relating to $warning. $level can have several values :
 
 	 0 : (welcome hackers !) No real security on the $name variable
 
-	 1 : (Medium security) All the escape shell caracters are escaped (&|; etc.)
+	 1 : (Medium security) All escape shell characters are escaped (&|; etc.)
 
-	 2 : (paranoid) All the escape shell caracters are delete !
+	 2 : (paranoid) All escape shell caracters are deleted !
 
-	 If you use File::Reader in CGI it's strongly recommend to use the lvl 2.
+	 If you use File::Reader in CGI it's strongly recommended to use the lvl 2.
 	Default is 1
 
 =head3 sReadConf :
@@ -993,6 +1083,58 @@ sReadConf2($conf_fln,$level,$sep) : see above for explanations relating to $leve
 
 sReadConfAdv2($conf_fln,$conf_start,$conf_stop,$level,$sep) : see above for explanations relating to $conf_start, $conf_stop, $level and $sep
 
+=head3 generateConfFile
+
+generateConfFile("perl_source","conf_file_name") : Generate a configuration file (named "conf_file_name") for "perl_source". 
+Moreover it re-write "perl_source" to support the new configuration file. 
+The original source is not changed. A new file is created, named "perl_source_withconf".
+The modified variables are those in upper case (as $VERSION).
+
+Ex :  Perl source file (donothing.pl) :
+
+#!/usr/bin/perl -w
+
+$VERSION = 1.0 ;
+
+$ETC_DIR = '/etc/' ;
+
+$var_dir = '/var/' ;
+
+print "my Version -> $VERSION, my etc directory -> $ETC_DIR and my var directory -> $var_dir\n" ;
+
+Now in another Perl script (gen_conf.pl) :
+
+#!/usr/bin/perl -w
+
+use File::Reader qw( generateConfFile ) ;
+
+generateConfFile("donothing.pl","donothing.conf") ;
+
+And after execution (it may takesome time if the "perl_source" is important) you could see 2 new file in the directory : donothing.conf and do nothing_withconf.pl.
+
+donothing_withconf.pl source code :
+
+#!/usr/bin/perl -w
+
+use File::Reader qw (ReadConf ) ;
+
+my %conf = ReadConf("donothing.conf");
+
+$VERSION = $conf{VERSION} ;
+
+$ETC_DIR = '$conf{ETC_DIR};
+
+$var_dir = '/var/' ;
+
+print "my Version -> $VERSION, my etc directory -> $ETC_DIR and my var directory -> $var_dir\n" ;
+
+And donothing.conf :
+
+## Configuration file for donothing.pl generated by File::Reader version 0.6
+
+VERSION = 1.0
+
+ETC_DIR = '/etc/'
 
 =head2 EXPORT
 
@@ -1004,7 +1146,7 @@ use File::Reader qw ( sWrite sReadConf ) ; # Export the two functions sWrite() a
 
 You can assume the compatibility with the old syntax of Battosai by :
 
-use File::Reader qw ( ecrire ouvre reecrire lireConfAdv lireConf listRep  listDir sReecrire sOuvre sLireConf sLireConfAdv lireConfAdv2 sLireConf2 sLireConfAdv2 lireConf2 ) ;
+use File::Reader qw ( ecrire ouvre reecrire lireConfAdv lireConf listRep sReecrire sOuvre sLireConf sLireConfAdv lireConfAdv2 sLireConf2 sLireConfAdv2 lireConf2 ) ;
 
 But this method is I<deprecated>. Moreover new function will B<never profit> from binding for old syntax. Moreover old syntax could be less powerful than the news.
 
