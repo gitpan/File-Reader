@@ -10,7 +10,7 @@ BEGIN
 	use Exporter();
 	our @ISA=qw(Exporter);
 	our @EXPORT_OK=qw(&Write &ecrire &ouvre &reecrire &lireConfAdv &lireConf &listRep  &listDir &sReecrire &sOuvre &sLireConf &sLireConfAdv &lireConfAdv2 &sLireConf2 &sLireConfAdv2 &lireConf2 &Read &ReWrite &ReadConfAdv &ReadConf &listRep &sReWrite &sWrite &sRead &sReadConf &sReadConfAdv &ReadConfAdv2 &sReadConf2 &sReadConfAdv2 &ReadConf2 &generateConfFile);
-	our $VERSION=0.6;
+	our $VERSION=0.61;
 }
 sub Write
 {

@@ -1,15 +1,21 @@
-File/Reader version 0.5
+File/Reader version 0.6
 ========================
 
 File::Reader allow you to simply manipulate your text files. You can easily read and write text file (or sources codes, HTML, XML, etc.).
 I personally use very often Write() to generate HTML code.
 File::Reader also provided a good interface for reading configuration files.
 
-This current release (0.5) work really fine. The module is not in version 1.0 because I hope to associate many news functions to him (read the TODO file for more information).
+This release contain a new function : generateConfFile()
 
 INSTALLATION
 
 To install this module type the following:
+
+Best :
+
+% perl -MCPAN -e 'install File::Reader'
+
+Standart :
 
    perl Makefile.PL
    make
