@@ -17,7 +17,7 @@ our @ISA = qw(Exporter);
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	&Write &ecrire &ouvre &reecrire &lireConfAdv &lireConf &listRep  &listDir &sReecrire &sOuvre &sLireConf &sLireConfAdv &lireConfAdv2 &sLireConf2 &sLireConfAdv2 &lireConf2 &Read &ReWrite &ReadConfAdv &ReadConf &listRep &sReWrite &sWrite &sRead &sReadConf &sReadConfAdv &ReadConfAdv2 &sReadConf2 &sReadConfAdv2 &ReadConf2 &generateConfFile
+	&Write &listDir &Read &ReWrite &ReadConfAdv &ReadConf &sReWrite &sWrite &sRead &sReadConf &sReadConfAdv &ReadConfAdv2 &sReadConf2 &sReadConfAdv2 &ReadConf2 &generateConfFile &WriteConf
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -26,7 +26,20 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
+
+sub WriteConf
+{
+	my ($file,%conf) = @_;
+	my @ff=();
+	unlink $file;
+	foreach my $key (keys(%conf))
+	{
+		chomp $conf{$key};
+		push @ff, "$key = $conf{$key}\n";
+	}
+	Write($file,@ff);
+}
 
 sub Write
 {
@@ -988,6 +1001,11 @@ File::Reader - Perl extension for Read and write easily text file
 	Write($file, @message) ;
 	sWrite($file,"Something to write\n",1,2) ;
 	%conf_file = ReadConf('/etc/file.conf') ;
+	
+	# A simple example for reading, using and writing config file
+	my %CONF = ReadConf('/etc/mysoft/soft.conf');
+	$CONF{'data-dir'} = '/tmp/'.$CONF{'data-dir'};
+	WriteConf('/etc/mysoft/soft.conf',%CONF);
 
 
 =head1 DESCRIPTION
@@ -996,13 +1014,17 @@ File::Reader - Perl extension for Read and write easily text file
 
 	Write(file_to_write, data_to_write) : this function write some data in a file. You can call it like that : Write($file, @data) ;
 
+=head3 WriteConf(file_to_write, %data_to_write) : this function write all data contains in %data_to_write into the file file_to_write in a format readable by ReadConf (key = value).
+
 =head3 Read :
 
-	Read("file_to_read") : read all data in "file_to_read". B<IMPORTANT> file is read just as it is ! Don't forget to treat data incomming :-). Read() return B<undef> if the file that you try to open does not exist.
+	Read("file_to_read") : read all data in "file_to_read". B<IMPORTANT> file is read just as it is ! Don't forget to treat data incomming :-). 
+	Read() return B<undef> if the file that you try to open does not exist.
 
 =head3 ReWrite :
 
-	ReWrite(file_to_write, data_to_write) : write data in the end of "file_to_write". If file does not exist ReWrite() create him. The function don't erase the original file. To really re-write a file (erase and write it) use Write().
+	ReWrite(file_to_write, data_to_write) : write data in the end of "file_to_write". If file does not exist ReWrite() create him. 
+	The function don't erase the original file. To really re-write a file (erase and write it) use Write().
 
 =head3 ReadConf :
 
@@ -1042,7 +1064,8 @@ File::Reader - Perl extension for Read and write easily text file
 
 =head3 ReadConfAdv2 :
 
-	ReadConfAdv2($conf_fln,$conf_start,$conf_stop,$level,$sep) : same options that ReadConfAdv() but you can specify, moreover, the separator of the pairs of keys/values in the configuration file (like ReadConf2() ).
+	ReadConfAdv2($conf_fln,$conf_start,$conf_stop,$level,$sep) : same options that ReadConfAdv() but you can specify, moreover,
+	 the separator of the pairs of keys/values in the configuration file (like ReadConf2() ).
 
 =head3 listDir :
 

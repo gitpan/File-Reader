@@ -1,13 +1,14 @@
 Changes
-Makefile.PL
 MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
 README
-gen_conf.pl
-t/File-Reader.t
 lib/File/Reader.pm
-t/PerlSource.pl
-t/ex1.conf
-t/sertarien
-t/nofile.conf
-
-META.yml                                 Module meta-data (added by MakeMaker)
+t/00.load.t
+t/01.Write.t
+t/02.Read.t
+t/03.WriteConf.t
+t/04.ReadConf_and_ReadConf2.t
+t/05.ReadConfAdv_and_ReadConfAdv2.t
+t/06.generateConfFile.t
+t/pod.t

@@ -1,4 +1,8 @@
-Revision history for Perl extension File::Reader.
+Revision history for File-Reader
+
+0.8 Fri Dec 03 12:00:00 2004
+	- Add WriteConf() function
+	- Fix test issues (I hope...)
 
 0.4 Mon Aug  23 18:47:32 2004
 	- add some tests on *Write* and *Read* functions
@@ -12,8 +16,3 @@ Revision history for Perl extension File::Reader.
 	- Update the 0.5 version (new == 0.51).
 		- Correct some bugs (like in *ReadConfAdv* functions).
 		- Provide a real test interface.
-
-0.5  Tue Jan 27 19:16:55 2004
-	- original version; created by h2xs 1.21 with options
-		-A -X -n File::ReaderReader
-
